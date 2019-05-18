@@ -108,7 +108,7 @@ export function EventEditor({ position: [ longitude, latitude ], onClose, setEve
                     </p>
                     <label className={styles.label}>
                         Название события
-                        <input className={styles.input} name="name" value={name} type="text" placeholder="Что происходит?" onChange={e => setName(e.target.value)} />
+                        <input className={styles.input} name="name" autoFocus value={name} type="text" placeholder="Что происходит?" onChange={e => setName(e.target.value)} />
                     </label>
                     <label className={styles.label}>
                         Описание

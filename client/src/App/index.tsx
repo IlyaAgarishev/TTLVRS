@@ -68,14 +68,28 @@ export default function Index() {
             >
                 <ZoomControl />
                 <Layer
-                    type="symbol"
-                    id="marker"
-                    layout={{ "icon-image": "marker-15" }}
+                    type="circle"
+                    paint={{
+                        'circle-radius': 5,
+                        'circle-color': '#E54E52',
+                        'circle-opacity': 0.8,
+                        'circle-stroke-width': 1,
+                        'circle-stroke-color': '#000'
+                    }}
                 >
                     <Feature coordinates={userPosition} />
+                </Layer>
+                <Layer
+                    type="circle"
+                    paint={{
+                        'circle-radius': 8,
+                        'circle-color': '#0000FF',
+                        'circle-opacity': 1
+                    }}
+                >
                     {
                         nearEvents.map(event => (
-                          <Feature coordinates={[ event.location.longitude, event.location.latitude ]} />
+                            <Feature coordinates={[ event.location.longitude, event.location.latitude ]} />
                         ))
                     }
                 </Layer>
