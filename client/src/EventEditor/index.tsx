@@ -51,7 +51,6 @@ export function EventEditor({
   setEvents
 }: EventEditorProps) {
   const [place, setPlace] = useState("");
-  const [shiftDown, setShiftDown] = useState(0);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -59,7 +58,7 @@ export function EventEditor({
   useEffect(() => {
     fetch(
       buildMapboxQuery(
-        `/geocoding/v5/mapbox.places/${latitude},${longitude}.json`
+        `/geocoding/v5/mapbox.places/${longitude},${latitude}.json`
       )
     )
       .then(resp => resp.json())
@@ -92,10 +91,7 @@ export function EventEditor({
 
   return (
     <Swipe onSwipeDown={onClose}>
-      <div
-        className={styles.wrapper}
-        style={{ transform: `translateY(${shiftDown})` }}
-      >
+      <div className={styles.wrapper}>
         <h1 className={styles.header}>Создать метку</h1>
         {error && <p>{error}</p>}
         {/*<button className={styles.close} type="button" onClick={onClose} />*/}
