@@ -1,0 +1,67 @@
+.eventWindow {
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background: white;
+  border: 5px solid #bcbeed;
+  border-radius: 10px;
+  position: absolute;
+  top: 0;
+  z-index: 1000;
+}
+
+.img {
+  width: 300px;
+  border-radius: 10px;
+}
+
+.title {
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.title,
+.text {
+  color: #9699eb;
+}
+
+.text {
+  margin-top: 10px;
+  width: 300px;
+}
+
+.bottomSection {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.geo {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  color: #9699eb;
+}
+
+.geoImg {
+  width: 20px;
+  margin-right: 10px;
+}
+
+.eventNow {
+  display: flex;
+  align-items: center;
+  color: #a9a9a9;
+  align-self: flex-end;
+}
+
+.circle {
+  width: 8px;
+  height: 8px;
+  border-radius: 20px;
+  background: #ccfbc8;
+  margin-right: 10px;
+}
