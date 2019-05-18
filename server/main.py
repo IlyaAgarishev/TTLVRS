@@ -6,10 +6,16 @@ from classes import *
 import json
 
 async def get_handler(request):
-    with db_session:
-        events_json = list(map(lambda x: x.event_to_dict(), Event.select()[:]))
-        response = web.Response(text=json.dumps(events_json, default=json_serial))
-        return response
+    if request.query.keys():
+        with db_session:
+            events_json = list(map(lambda x: x.event_to_dict(), Event.select()[:]))
+            response = web.Response(text=json.dumps(events_json, default=json_serial))
+            return response
+    else:
+        with db_session:
+            events_json = list(map(lambda x: x.event_to_dict(), Event.select()[:]))
+            response = web.Response(text=json.dumps(events_json, default=json_serial))
+            return response
 
 async def post_handler(request):
     request_json = await request.json()
