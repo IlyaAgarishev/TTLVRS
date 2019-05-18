@@ -1,90 +1,90 @@
 @keyframes appear {
-    0% {
-        transform: translateY(100%);
-    }
-    100% {
-        transform: translateY(0);
-    }
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 .wrapper {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
 
-    background: white;
-    width: 100%;
-    height: 80%;
-    border-radius: 20px 20px 0 0;
+  background: white;
+  width: 100%;
+  height: 80%;
+  border-radius: 20px 20px 0 0;
 
-    padding: 20px;
-    animation: appear 500ms forwards;
+  padding: 20px;
+  animation: appear 500ms forwards;
 }
 
 .header {
-    margin: 0;
+  margin: 0;
 }
 
 .close {
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin: 20px;
-    width: 20px;
-    height: 20px;
-    border: 0;
-    color: #666;
-    background-size: 100% 100%;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Cg fill='%23666' fill-rule='evenodd' transform='translate(-.812 -1.312)'%3E%3Crect width='59' height='4' x='-7' y='21' rx='2' transform='rotate(45 22.5 23)'/%3E%3Crect width='59' height='4' x='-7' y='21' rx='2' transform='scale(-1 1) rotate(45 0 -31.32)'/%3E%3C/g%3E%3C/svg%3E%0A");
-    cursor: pointer;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 20px;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  color: #666;
+  background-size: 100% 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Cg fill='%23666' fill-rule='evenodd' transform='translate(-.812 -1.312)'%3E%3Crect width='59' height='4' x='-7' y='21' rx='2' transform='rotate(45 22.5 23)'/%3E%3Crect width='59' height='4' x='-7' y='21' rx='2' transform='scale(-1 1) rotate(45 0 -31.32)'/%3E%3C/g%3E%3C/svg%3E%0A");
+  cursor: pointer;
 }
 
 .form {
-    display: flex;
-    flex-flow: column;
+  display: flex;
+  flex-flow: column;
 }
 
 .place {
-    display: block;
+  display: block;
 }
 
 .label {
-    font-weight: bold;
-    margin-right: 20px;
+  font-weight: bold;
+  margin-right: 20px;
 }
 
 .placeValue {
-    font-family: Pacifico, cursive;
-    color: #666;
+  font-family: Pacifico, cursive;
+  color: #666;
 }
 
 .input {
-    display: block;
-    border: 0;
-    border-radius: 5px;
-    background-color: #F2F2F2;
-    margin: 10px 0;
-    padding: 10px 20px;
-    width: 100%;
-    font-size: 1rem;
+  display: block;
+  border: 0;
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  margin: 10px 0;
+  padding: 10px 20px;
+  width: 100%;
+  font-size: 1rem;
 }
 
 .submit {
-    position: absolute;
-    top: 0;
-    right: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
 
-    margin: 20px;
+  margin: 20px;
 
-    padding: 10px 20px;
-    font-size: 1rem;
-    background: white;
-    border-radius: 5px;
-    border: 1px solid currentColor;
+  padding: 10px 20px;
+  font-size: 1rem;
+  background: white;
+  border-radius: 5px;
+  border: 1px solid currentColor;
 }
 
 .submit:hover {
-    color: white;
-    background: black;
+  color: white;
+  background: black;
 }
