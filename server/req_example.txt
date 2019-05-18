@@ -1,1 +1,0 @@
-{"name": "My Event", "description": "", "location": {"latitude": 1, "longitude": 1}}

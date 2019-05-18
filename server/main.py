@@ -5,35 +5,26 @@ from db import db
 from classes import *
 import json
 
-async def handler(request):
-    request_json = 'Ne nu eto BAN'
-    try:
-        request_json = await request.json()
-    except json.decoder.JSONDecodeError:
-        print(request_json)
-        return web.Response(text=request_json)
-    print(request_json)
-    return web.Response(text="Ok")
+async def get_handler(request):
+    with db_session:
+        events_json = list(map(lambda x: x.event_to_dict(), Event.select()[:]))
+        response = web.Response(text=json.dumps(events_json, default=json_serial))
+        return response
 
-async def main():
-    server = web.Server(handler)
-    runner = web.ServerRunner(server)
-    await runner.setup()
-    site = web.TCPSite(runner, '0.0.0.0', 8080)
-    await site.start()
+async def post_handler(request):
+    request_json = await request.json()
+    add_event(request_json)
+    response = web.Response()
+    return response
 
-    print("======= Serving on http://0.0.0.0:8080/ ======")
+def main():
+    app = web.Application()
+    app.add_routes([web.get('/api/events', get_handler)])
+    app.add_routes([web.post('/api/events', post_handler)])
 
-    # pause here for very long time by serving HTTP requests and
-    # waiting for keyboard interruption
-    await asyncio.sleep(100*3600)
-
+    web.run_app(app)
+    print("======= Running ======")
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    try:
-        loop.run_until_complete(main())
-    except KeyboardInterrupt:
-        pass
-    loop.close()
-
+    db.generate_mapping(create_tables=True)
+    main()
