@@ -1,12 +1,14 @@
-@import url("https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900&display=swap");
-
 *,
 *:before,
 *:after {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 body {
-  margin: 0;
-  font-family: "Roboto";
+    margin: 0;
+    font-family: Roboto, Helvetica, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: Pacifico, cursive;
 }
