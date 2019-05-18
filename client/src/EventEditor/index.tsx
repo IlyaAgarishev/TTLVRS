@@ -124,7 +124,7 @@ export function EventEditor({
             />
           </label>
           <button className={styles.submit} type="submit">
-            Отметить
+            Создать
           </button>
         </form>
       </div>
