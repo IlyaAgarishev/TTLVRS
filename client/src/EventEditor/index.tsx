@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useCallback, useEffect, useState } from "react";
+import React, { SyntheticEvent, useEffect, useState } from "react";
 // @ts-ignore
 import Swipe from "react-easy-swipe";
 import styles from "./index.module.css";
@@ -66,7 +66,7 @@ export function EventEditor({
       .then(geo => setPlace(getPlaceName(geo)));
   }, [latitude, longitude]);
 
-  const submit = useCallback((e: SyntheticEvent) => {
+  const submit = (e: SyntheticEvent) => {
     e.preventDefault();
     const data: ChilliumEvent = {
       name,
@@ -88,7 +88,7 @@ export function EventEditor({
 
     setEvents((events: any) => [...events, data]);
     onClose();
-  }, []) as any;
+  };
 
   return (
     <Swipe onSwipeDown={onClose}>
