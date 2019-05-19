@@ -1,46 +1,63 @@
-import React, { HTMLProps, useState } from "react";
-import styled from "styled-components";
-const filters = ["бесплатные", "андерграунд", "музыка", "прогулки"];
+import React, { useEffect, useState } from "react";
+import { api } from "../config";
+import { Filter } from "../types";
+import { FilterBase, FiltersContainer } from "./styled";
 
 interface FilterProps {
-  name: string;
+  filter: Filter;
+  onSelect: () => void;
+  selected: boolean;
 }
 
-const FilterBase = styled.button<
-  { active: boolean } & React.HTMLProps<HTMLButtonElement>
->`
-  background: ${({ active }) => (active ? "#cecece" : "#fff")};
-  border-radius: 10px;
-  margin: 10px;
-  padding: 10px;
-  color: rgba(0, 0, 0, 0.7);
-  border: 0;
-  box-shadow: 0 0 3px 1px rgba(0, 0, 0, 0.3);
-`;
-
-const FiltersContainer = styled.div`
-  display: flex;
-  flex-flow: row nowrap;
-  width: 100%;
-  overflow-x: scroll;
-`;
-
-function Filter({ name }: FilterProps) {
-  const [active, setActive] = useState(false);
-
+function FilterEntry({ filter, onSelect, selected }: FilterProps) {
   return (
-    <FilterBase onClick={() => setActive(!active)} active={active}>
-      {name}
+    <FilterBase onClick={onSelect} active={selected}>
+      {filter.name}
     </FilterBase>
   );
 }
 
-export function QuickFilters() {
+interface QuickFiltersProps {
+  changeSelectedTags: (selected: Filter[]) => void;
+  selectedTags: Filter[];
+}
+
+export function QuickFilters({
+  selectedTags,
+  changeSelectedTags
+}: QuickFiltersProps) {
+  const [availableTags, setAvailableTags] = useState<Filter[]>([]);
+
+  useEffect(() => {
+    fetch(api("/api/categories"))
+      .then(resp => resp.json())
+      .then((tags: { [arg: string]: string }) => {
+        const parsedTags = Object.entries(tags).map(
+          ([nameEng, name]: [string, string]) => ({ nameEng, name })
+        );
+        setAvailableTags(parsedTags);
+      });
+  }, []);
+
   return (
     <FiltersContainer>
-      {filters.map(filter => (
-        <Filter name={filter} />
-      ))}
+      {availableTags.map(filter => {
+        const selected = selectedTags.includes(filter);
+        return (
+          <FilterEntry
+            key={filter.nameEng}
+            filter={filter}
+            selected={selected}
+            onSelect={() => {
+              if (selected) {
+                changeSelectedTags(selectedTags.filter(tag => tag !== filter));
+              } else {
+                changeSelectedTags([...selectedTags, filter]);
+              }
+            }}
+          />
+        );
+      })}
     </FiltersContainer>
   );
 }
