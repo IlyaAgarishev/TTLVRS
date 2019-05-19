@@ -41,7 +41,7 @@ class Media(db.Entity):
     event = Required('Event')
 
 Categories = {'entertainment': 'Развлечения', 'music': 'Музыка', 'progress': 'Развитие',
-              'food': 'Еда', 'near': 'Близко', 'soon': 'Скоро', 'meeting': 'Собрание'}
+              'food': 'Еда', 'meeting': 'Собрание'} # 'near': 'Близко', 'soon': 'Скоро', 
 
 @db_session
 def add_event(event_dict):
