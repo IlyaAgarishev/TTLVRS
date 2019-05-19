@@ -35,10 +35,10 @@ class Author(db.Entity):
 @db_session
 def add_event(event_dict):
     # print(event_dict)
-    pos_dist = event_dict['location']
-    loc = Location(latitude=pos_dist['latitude'], 
-                   longitude=pos_dist['longitude'], 
-                   name=pos_dist.get('name', None))
+    loc_dict = event_dict['location']
+    loc = Location(latitude=loc_dict['latitude'], 
+                   longitude=loc_dict['longitude'], 
+                   name=loc_dict.get('name', None))
     Event(name=event_dict['name'], 
           time_start=get_time(event_dict['time_start']), 
           time_end=get_time(event_dict['time_end']), 
