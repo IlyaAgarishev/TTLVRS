@@ -1,10 +1,31 @@
-import React, { SyntheticEvent, useEffect, useState } from "react";
+import React, {
+  HTMLProps,
+  SyntheticEvent,
+  useEffect,
+  useRef,
+  useState
+} from "react";
 // @ts-ignore
 import Swipe from "react-easy-swipe";
 import styles from "./index.module.css";
-import { ChilliumEvent, MapCoords } from "../App";
 import { useReverseGeo } from "../hooks/useReverseGeo";
 import { api } from "../config";
+import styled from "styled-components";
+import recordIcon from "../img/record.svg";
+import photoIcon from "../img/photo.svg";
+import { ChilliumEvent, MapCoords } from "../types";
+
+const IconButton = styled.button<
+  { src: string } & HTMLProps<HTMLButtonElement>
+>`
+  background: url(${({ src }) => src}) no-repeat center center / 50% 50%,
+    rgba(255, 255, 255, 0.5);
+  width: 40px;
+  height: 40px;
+  margin: 5px;
+  border-radius: 50%;
+  border: 2px solid white;
+`;
 
 interface EventEditorProps {
   position: MapCoords;
@@ -17,12 +38,28 @@ export function EventEditor({ position, onClose, onAdd }: EventEditorProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState<string | null>(null);
-
+  const videoRef = useRef(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
   const place = useReverseGeo(position);
+
+  useEffect(() => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices
+        .getUserMedia({ video: true })
+        .then(function(stream) {
+          if (videoRef && videoRef.current) {
+            // @ts-ignore
+            videoRef.current.srcObject = stream;
+            // @ts-ignore
+            videoRef.current.play();
+          }
+        });
+    }
+  }, []);
 
   const submit = (e: SyntheticEvent) => {
     e.preventDefault();
-    const data: ChilliumEvent = {
+    const data: Partial<ChilliumEvent> = {
       name,
       description,
       location: position,
@@ -44,13 +81,11 @@ export function EventEditor({ position, onClose, onAdd }: EventEditorProps) {
       },
       () => setError("Error")
     );
-
-    onClose();
   };
 
   return (
     <Swipe onSwipeDown={onClose}>
-      <div className={styles.wrapper}>
+      <form className={styles.wrapper} onSubmit={submit}>
         <div className={styles.header}>
           <h1 className={styles.popupName}>Создать метку</h1>
           <button className={styles.submit} type="submit">
@@ -58,8 +93,7 @@ export function EventEditor({ position, onClose, onAdd }: EventEditorProps) {
           </button>
         </div>
         {error && <p>{error}</p>}
-        {/*<button className={styles.close} type="button" onClick={onClose} />*/}
-        <form className={styles.form} onSubmit={submit}>
+        <div className={styles.form}>
           <p className={styles.place}>
             <span className={styles.label}>Место:</span>
             <span className={styles.placeValue}>{place}</span>
@@ -87,8 +121,21 @@ export function EventEditor({ position, onClose, onAdd }: EventEditorProps) {
               onChange={e => setDescription(e.target.value)}
             />
           </label>
-        </form>
-      </div>
+          <div className={styles.photoContainer}>
+            <video
+              className={styles.camera}
+              ref={videoRef}
+              width="200"
+              height="200"
+              autoPlay
+            />
+            <div className={styles.photoCover}>
+              <IconButton type="button" src={photoIcon} />
+              <IconButton type="button" src={recordIcon} />
+            </div>
+          </div>
+        </div>
+      </form>
     </Swipe>
   );
 }

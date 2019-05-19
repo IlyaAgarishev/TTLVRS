@@ -1,93 +1,71 @@
 /* eslint-disable react/style-prop-object */
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 // @ts-ignore
-import { YMaps, Map, Placemark, ZoomControl } from "react-yandex-maps";
+import { Circle, Map, Placemark, YMaps, ZoomControl } from "react-yandex-maps";
 import { EventEditor } from "../EventEditor";
 import EventWindow from "../EventWindow";
-import styled from "styled-components";
 import logoSrc from "../img/logotype.svg";
 import { QuickFilters } from "../QuickFilters";
 import { api } from "../config";
+import { buildQuery } from "../utils";
+import { Header, HeaderContainer } from "./styled";
+import { ChilliumEvent, Filter, MapCoords } from "../types";
 
-export type MapCoords = {
-  latitude: number;
-  longitude: number;
-};
-
-export interface ChilliumEvent {
-  name: string;
-  description: string;
-  location: {
-    latitude: number;
-    longitude: number;
-  };
-  time_start: string;
-  time_end: string;
-}
+const SEARCH_RADIUS_IN_METERS = 2000;
 
 const kievCoords = {
-  latitude: 30.526719307390927,
-  longitude: 50.469711345117666
+  latitude: 50.449009,
+  longitude: 30.522487
 };
-
-const Header = styled.h1`
-  display: inline-flex;
-  flex-flow: row nowrap;
-  justify-content: center;
-  align-items: center;
-  margin: 0 auto 10px;
-  font-family: "Arial Black", sans-serif;
-  font-size: 20px;
-  background: white;
-  border-radius: 0 0 10px 10px;
-  padding: 3px 15px;
-  color: rgba(0, 0, 0, 0.7);
-  border: 0;
-  box-shadow: 0 0 3px 1px rgba(0, 0, 0, 0.3);
-`;
-
-const HeaderContainer = styled.header`
-  text-align: center;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-`;
 
 export default function Index() {
   const [
     { latitude: userLatitude, longitude: userLongitude },
     setUserPosition
   ] = useState<MapCoords>(kievCoords);
+  const [
+    { latitude: screenLatitude, longitude: screenLongitude },
+    setScreenPosition
+  ] = useState<MapCoords>(kievCoords);
   const [eventEditorOpened, setEventEditorOpened] = useState(false);
-  const [selectedPosition, setSelectedPosition] = useState<MapCoords>(
-    kievCoords
+  const [selectedPosition, setSelectedPosition] = useState<MapCoords | null>(
+    null
   );
   const [nearEvents, setNearEvents] = useState<ChilliumEvent[]>([]);
   const [openedEvent, setOpenedEvent] = useState<ChilliumEvent | null>(null);
+  const [selectedTags, setSelectedTags] = useState<Filter[]>([]);
+  const [zoom, setZoom] = useState<number>(17);
 
   useEffect(() => {
     const savePosition = (position: Position) => {
-      setUserPosition({
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude
-      });
+      const coords = position.coords;
+      setUserPosition(coords);
+    };
+
+    const saveAndMove = (position: Position) => {
+      const coords = position.coords;
+      setUserPosition(coords);
+      setScreenPosition(coords);
     };
 
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(savePosition);
+      navigator.geolocation.getCurrentPosition(saveAndMove);
       const id = navigator.geolocation.watchPosition(savePosition);
       return () => navigator.geolocation.clearWatch(id);
     }
   }, []);
 
   const fetchEvents = useCallback(() => {
-    fetch(
-      api(
-        `/api/events?latitude=${userLatitude}&longitude=${userLongitude}&radius=1000`
-      )
-    )
+    const query = buildQuery({
+      latitude: screenLatitude,
+      longitude: screenLongitude,
+      user_lat: userLatitude,
+      user_long: userLongitude,
+      radius: SEARCH_RADIUS_IN_METERS,
+      categories: selectedTags.map(tag => tag.nameEng).join(",")
+    });
+
+    fetch(api(`/api/events${query}`))
       .then(resp => {
         if (resp.ok) {
           return resp.json();
@@ -97,31 +75,47 @@ export default function Index() {
       })
       .then((events: ChilliumEvent[]) => setNearEvents(events))
       .catch(console.error);
-  }, [userLongitude, userLatitude]);
+  }, [
+    screenLongitude,
+    screenLatitude,
+    selectedTags,
+    userLongitude,
+    userLatitude
+  ]);
 
   useEffect(fetchEvents, [fetchEvents]);
 
   const selectPosition = useCallback(event => {
     const [latitude, longitude] = event.get("coords");
-
-    setEventEditorOpened(true);
     setSelectedPosition({
       latitude,
       longitude
     });
   }, []);
 
+  const handleBoundsChange = useCallback((event: any) => {
+    const [latitude, longitude] = event.get("newCenter");
+    setZoom(event.get("newZoom"));
+    setScreenPosition({ longitude, latitude });
+  }, []);
+
+  const onAdd = () => {
+    setEventEditorOpened(false);
+    setSelectedPosition(null);
+  };
+
   return (
     <div>
       <YMaps>
         <Map
           state={{
-            center: [userLatitude, userLongitude],
-            zoom: 17
+            center: [screenLatitude, screenLongitude],
+            zoom
           }}
           width="100vw"
           height="100vh"
           onClick={selectPosition}
+          onBoundsChange={handleBoundsChange}
         >
           <ZoomControl
             options={{
@@ -138,8 +132,17 @@ export default function Index() {
               iconContent: "Вы здесь"
             }}
           />
+          {selectedPosition && (
+            <Placemark
+              geometry={[selectedPosition.latitude, selectedPosition.longitude]}
+              properties={{ iconContent: "Добавить событие" }}
+              options={{ preset: "islands#nightStretchyIcon" }}
+              onClick={() => setEventEditorOpened(true)}
+            />
+          )}
           {nearEvents.map(event => (
             <Placemark
+              key={event.id}
               geometry={[event.location.latitude, event.location.longitude]}
               options={{ preset: "islands#blackDotIcon" }}
               onClick={() => {
@@ -147,6 +150,21 @@ export default function Index() {
               }}
             />
           ))}
+          {zoom < 13 && (
+            <Circle
+              geometry={[
+                [screenLatitude, screenLongitude],
+                SEARCH_RADIUS_IN_METERS
+              ]}
+              options={{
+                fillColor: "#FFFFFF",
+                strokeColor: "#7B99E1",
+                fillOpacity: 0.3,
+                strokeOpacity: 0.5,
+                strokeWidth: 3
+              }}
+            />
+          )}
         </Map>
       </YMaps>
       <HeaderContainer>
@@ -154,12 +172,15 @@ export default function Index() {
           <img src={logoSrc} alt="Logotype" height={30} />
           Чиллиум
         </Header>
-        <QuickFilters />
+        <QuickFilters
+          selectedTags={selectedTags}
+          changeSelectedTags={setSelectedTags}
+        />
       </HeaderContainer>
       {eventEditorOpened && (
         <EventEditor
-          position={selectedPosition}
-          onAdd={fetchEvents}
+          position={selectedPosition || { longitude: 0, latitude: 0 }}
+          onAdd={onAdd}
           onClose={() => setEventEditorOpened(false)}
           setEvents={setNearEvents}
         />

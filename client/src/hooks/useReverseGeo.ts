@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { MapCoords } from "../App";
 import config from "../config";
+import { MapCoords } from "../types";
 
 interface ReverseGeoFeature {
   type: string;
