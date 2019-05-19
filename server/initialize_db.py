@@ -13,20 +13,30 @@ if __name__ == "__main__":
         author = add_author(author)
         loc = {'latitude':56.837773, 'longitude':60.603695, 
                'name':'Родонитовый монолит'}
-        add_event({'name':'Музыкальный вечер', 
-                   'time_start':'2019-05-19T20:00:00', 
-                   'time_end':'2019-05-20T00:00:00', 
-                   'location':loc, 
-                   'description':'Будем петь песни и веселиться!\nЗовите друзей!', 
-                   'author':author})
+        event = add_event({'name':'Музыкальный вечер', 
+                           'time_start':'2019-05-19T20:00:00', 
+                           'time_end':'2019-05-20T00:00:00', 
+                           'location':loc,
+                           'category':'music',
+                           'description':'Будем петь песни и веселиться!\nЗовите друзей!', 
+                            'author':author})
+        add_media({'media_type': 'image', 'link': 'https://avatars.mds.yandex.net/get-altay/904281/2a0000016286ede0dd0e1195ac586b93bb90/XXXL', 
+                  'event': event})
         loc = {'latitude':56.838453, 'longitude':60.602941, 
                'name':'Бюст Д. Н. Мамина-Сибиряка'}
-        add_event({'name':'Музыкальный вечер', 
-                   'time_start':'2019-05-20T20:00:00', 
-                   'time_end':'2019-05-21T00:00:00', 
-                   'location':loc, 
-                   'description':'Будем петь песни и веселиться!\nЗовите друзей!', 
-                   'author':author})
+        event = add_event({'name':'Музыкальный вечер', 
+                           'time_start':'2019-05-20T20:00:00', 
+                           'time_end':'2019-05-21T00:00:00', 
+                           'location':loc, 
+                           'category':'music',
+                           'description':'Будем петь песни и веселиться!\nЗовите друзей!', 
+                            'author':author})
+        add_media({'media_type': 'image', 'link': 'https://avatars.mds.yandex.net/get-altay/367512/2a0000015cb19a41a452b4d946d75518c163/XXXL', 
+                  'event': event})
+        add_media({'media_type': 'image', 'link': 'http://semantic.uraic.ru/icons/getimage.ashx?id=31383', 
+                  'event': event})
+        add_media({'media_type': 'image', 'link': 'https://media-cdn.tripadvisor.com/media/photo-s/08/09/ed/60/caption.jpg',
+                  'event': event})
 
         author = {'name':'Члены партии КПРФ', 
                   'description':'Мы - активная часть партии и её движущая сила!'}
@@ -36,13 +46,15 @@ if __name__ == "__main__":
         add_event({'name':'Протест КПРФ', 
                    'time_start':'2019-05-20T12:00:00', 
                    'time_end':'2019-05-20T17:00:00', 
-                   'location':loc, 
+                   'location':loc,
+                   'category':'meeting',
                    'description':'Будем протестовать против повышения пенсионного возраста!', 
                    'author':author})
         add_event({'name':'Очередной протест КПРФ', 
                     'time_start':'2019-05-21T12:00:00', 
                     'time_end':'2019-05-21T17:00:00', 
                     'location':loc, 
+                   'category':'meeting',
                     'description':'Будем снова протестовать против повышения пенсионного возраста!', 
                     'author':author})
 
@@ -55,6 +67,7 @@ if __name__ == "__main__":
                    'time_start':'2019-05-20T12:00:00', 
                    'time_end':'2019-05-30T20:00:00', 
                    'location':loc, 
+                   'category':'entertainment',
                    'description':'Будут представлены работы многих известных артистов ЕКБ.', 
                    'author':author})
 
@@ -67,5 +80,6 @@ if __name__ == "__main__":
                    'time_start':'2019-05-20T12:00:00', 
                    'time_end':'2019-05-30T20:00:00', 
                    'location':loc, 
+                   'category':'entertainment',
                    'description':'Ранее неизданные работы и произведения.', 
                    'author':author})

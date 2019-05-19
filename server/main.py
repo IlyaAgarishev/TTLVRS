@@ -3,12 +3,11 @@ from aiohttp import web
 import asyncio
 import aiohttp_cors
 import os
+import json
 
 from db import db
 from classes import *
 
-# http://10.34.34.56:8080/api/events?latitude=56.8378024&longitude=60.6030364&radius=500&time_start=2019-05-21T00:00:00&time_end=2019-06-01T00:00:00
-# http://10.34.34.56:8080/api/authors?id=1
 
 async def get_events_handler(request): # request is BaseRequest
     query = request.query # query is MultiDictProxy
@@ -20,8 +19,19 @@ async def get_events_handler(request): # request is BaseRequest
         if 'time_start' in query and 'time_end' in query:
             ids = get_event_ids_in_interval(Event, get_time(query['time_start']), get_time(query['time_end']))
             relevant_event_ids = relevant_event_ids.intersection(ids)
+        if 'categories' in query :
+            ids = get_event_ids_in_categories(Event, query['categories'])
+            relevant_event_ids = relevant_event_ids.intersection(ids)
+        if not relevant_event_ids:
+            relevant_event_ids = set(select(x.id for x in Event)[:])
         events = Event.select(lambda x: x.id in relevant_event_ids)[:]
-        events_json = events_to_json(events)
+        distances = [geodesic((event.location.latitude, event.location.longitude), (query['user_lat'], query['user_long'])).m 
+                     for event in events]
+        # events_json = events_to_json(events)
+        events_dict = json.loads(events_to_json(events))
+        for i, event_dict in enumerate(events_dict):
+            event_dict['distance'] = distances[i]
+        events_json = json.dumps(events_dict)
     response = web.Response(text=events_json)
     return response
 
@@ -34,6 +44,10 @@ async def get_authors_handler(request):
     response = web.Response(text=author_events_json)
     return response
 
+async def get_categories_handler(request): 
+    query = request.query
+    return web.Response(text=json.dumps(Categories))
+
 async def post_handler(request):
     request_json = await request.json()
     add_event(request_json)
@@ -45,6 +59,7 @@ def main():
 
     app.router.add_route("GET", "/api/events", get_events_handler)
     app.router.add_route("GET", "/api/authors", get_authors_handler)
+    app.router.add_route("GET", "/api/categories", get_categories_handler)
     app.router.add_route("POST", "/api/events", post_handler)
 
     cors = aiohttp_cors.setup(app, defaults={
@@ -52,6 +67,7 @@ def main():
             allow_credentials=True,
             expose_headers="*",
             allow_headers="*",
+            allow_methods="*",
         )
     })
 
