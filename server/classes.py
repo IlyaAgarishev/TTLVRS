@@ -58,6 +58,11 @@ def get_event_ids_in_radius(Event, latitude, longitude, radius):
             relevant_event_ids.append(event_id)
     return relevant_event_ids
 
+def get_event_ids_in_interval(Event, time_start, time_end):
+    return select(event.id for event in Event 
+                  if time_start <= event.time_start and 
+                     event.time_start <= time_end)[:]
+
 def get_time(iso_time):
     return dateutil.parser.parse(iso_time)
 
@@ -65,4 +70,3 @@ def json_serial(obj):
     if isinstance(obj, datetime):
         return obj.isoformat()
     raise TypeError (f"Type {type(obj)} is not serializable")
-
