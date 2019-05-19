@@ -7,6 +7,7 @@
     "@types/node": "12.0.2",
     "@types/react": "16.8.17",
     "@types/react-dom": "16.8.4",
+    "@types/styled-components": "^4.1.15",
     "mapbox-gl": "^0.54.0",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
@@ -14,6 +15,8 @@
     "react-easy-swipe": "^0.0.17",
     "react-mapbox-gl": "latest",
     "react-scripts": "3.0.1",
+    "react-yandex-maps": "^3.0.2",
+    "styled-components": "^4.2.0",
     "typescript": "3.4.5"
   },
   "scripts": {
@@ -41,5 +44,5 @@
       "pre-commit": "pretty-quick --staged"
     }
   },
-  "proxy": "http://10.34.34.56:8080/"
+  "proxy": "http://localhost:8080/"
 }

@@ -20,7 +20,17 @@
 }
 
 .header {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.popupName {
   margin: 0;
+  font-size: 1.3rem;
+  color: rgba(0, 0, 0, 0.8);
 }
 
 .close {
@@ -67,12 +77,6 @@
 }
 
 .submit {
-  position: absolute;
-  top: 0;
-  right: 0;
-
-  margin: 20px;
-
   padding: 10px 20px;
   font-size: 1rem;
   background: white;

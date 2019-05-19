@@ -2,97 +2,61 @@ import React, { SyntheticEvent, useEffect, useState } from "react";
 // @ts-ignore
 import Swipe from "react-easy-swipe";
 import styles from "./index.module.css";
-import config from "../config";
-import { ChilliumEvent } from "../App";
+import { ChilliumEvent, MapCoords } from "../App";
+import { useReverseGeo } from "../hooks/useReverseGeo";
+import { api } from "../config";
 
 interface EventEditorProps {
-  position: [number, number];
+  position: MapCoords;
   onClose: () => void;
+  onAdd: () => void;
   setEvents: any;
 }
 
-interface ReverseGeoFeature {
-  type: string;
-  id: string;
-  center: [number, number];
-  place_name: string;
-  place_type: string[];
-  properties: {
-    [name: string]: string;
-  };
-  relevance: number;
-  text: string;
-}
-
-interface ReverseGeoResponse {
-  features: ReverseGeoFeature[];
-}
-
-function buildMapboxQuery(query: string) {
-  return `https://api.mapbox.com${query}?access_token=${config.mapboxToken}`;
-}
-
-function getPlaceName(geo: ReverseGeoResponse) {
-  if (geo.features.length > 0) {
-    if (geo.features[0].properties["address"]) {
-      // @ts-ignore
-      return geo.features[0].properties.address;
-    } else {
-      return geo.features[0].text;
-    }
-  } else {
-    return "Неизвестно где";
-  }
-}
-
-export function EventEditor({
-  position: [longitude, latitude],
-  onClose,
-  setEvents
-}: EventEditorProps) {
-  const [place, setPlace] = useState("");
+export function EventEditor({ position, onClose, onAdd }: EventEditorProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetch(
-      buildMapboxQuery(
-        `/geocoding/v5/mapbox.places/${longitude},${latitude}.json`
-      )
-    )
-      .then(resp => resp.json())
-      .then(geo => setPlace(getPlaceName(geo)));
-  }, [latitude, longitude]);
+  const place = useReverseGeo(position);
 
   const submit = (e: SyntheticEvent) => {
     e.preventDefault();
     const data: ChilliumEvent = {
       name,
       description,
-      location: {
-        latitude,
-        longitude
-      }
+      location: position,
+      time_start: new Date().toISOString(),
+      time_end: new Date().toISOString()
     };
 
-    // fetch('/api/events', {
-    //     headers: {
-    //         'Accept': 'application/json',
-    //         'Content-Type': 'application/json'
-    //     },
-    //     method: 'POST',
-    //     body: JSON.stringify(data),
-    // }).then(onClose, () => setError('Error'));
+    fetch(api("/api/events"), {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      method: "POST",
+      body: JSON.stringify(data)
+    }).then(
+      () => {
+        onAdd();
+        onClose();
+      },
+      () => setError("Error")
+    );
 
-    setEvents((events: any) => [...events, data]);
     onClose();
   };
 
   return (
     <Swipe onSwipeDown={onClose}>
       <div className={styles.wrapper}>
-        <h1 className={styles.header}>Создать метку</h1>
+        <div className={styles.header}>
+          <h1 className={styles.popupName}>Создать метку</h1>
+          <button className={styles.submit} type="submit">
+            Создать
+          </button>
+        </div>
         {error && <p>{error}</p>}
         {/*<button className={styles.close} type="button" onClick={onClose} />*/}
         <form className={styles.form} onSubmit={submit}>
@@ -123,9 +87,6 @@ export function EventEditor({
               onChange={e => setDescription(e.target.value)}
             />
           </label>
-          <button className={styles.submit} type="submit">
-            Создать
-          </button>
         </form>
       </div>
     </Swipe>
