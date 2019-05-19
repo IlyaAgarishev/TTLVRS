@@ -19,11 +19,9 @@ async def get_events_handler(request): # request is BaseRequest
         if 'time_start' in query and 'time_end' in query:
             ids = get_event_ids_in_interval(Event, get_time(query['time_start']), get_time(query['time_end']))
             relevant_event_ids = relevant_event_ids.intersection(ids)
-        if 'categories' in query  and not query['categories']:
+        if query['categories']:
             ids = get_event_ids_in_categories(Event, query['categories'])
             relevant_event_ids = relevant_event_ids.intersection(ids)
-        # if not relevant_event_ids:
-        #     relevant_event_ids = set(select(x.id for x in Event)[:])
         events = Event.select(lambda x: x.id in relevant_event_ids)[:]
         distances = [geodesic((event.location.latitude, event.location.longitude), (query['user_lat'], query['user_long'])).m 
                      for event in events]
