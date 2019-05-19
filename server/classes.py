@@ -2,7 +2,7 @@ from datetime import datetime
 from pony.orm import *
 from db import db
 import dateutil.parser
-
+from geopy.distance import geodesic
 
 class Location(db.Entity):
     latitude = Required(float)
@@ -31,7 +31,7 @@ class Author(db.Entity):
 
 @db_session
 def add_event(event_dict):
-    print(event_dict)
+    # print(event_dict)
     pos_dist = event_dict['location']
     loc = Location(latitude=pos_dist['latitude'], 
                    longitude=pos_dist['longitude'], 
@@ -48,6 +48,15 @@ def add_author(author_dict):
     author = Author(name=author_dict['name'], 
                     description=author_dict.get('description', None))
     return author  
+
+def get_event_ids_in_radius(Event, latitude, longitude, radius):
+    relevant_event_ids = []
+    for event in Event.select():
+        event_location = event.location.latitude, event.location.longitude
+        event_id = event.id
+        if geodesic(event_location, (latitude, longitude)).m < radius:
+            relevant_event_ids.append(event_id)
+    return relevant_event_ids
 
 def get_time(iso_time):
     return dateutil.parser.parse(iso_time)
