@@ -2,6 +2,7 @@ import aiohttp
 from aiohttp import web
 import asyncio
 import aiohttp_cors
+import os
 
 from db import db
 from classes import *
@@ -57,8 +58,7 @@ def main():
     for route in list(app.router.routes()):
         cors.add(route)
 
-    web.run_app(app)
-    print("====== Running ======")
+    web.run_app(app, port=os.environ.get("PORT", 8080))
 
 if __name__ == "__main__":
     db.generate_mapping(create_tables=True)
