@@ -1,8 +1,11 @@
 from datetime import datetime
-from pony.orm import *
-from db import db
 import dateutil.parser
 from geopy.distance import geodesic
+from pony.orm import *
+import json
+
+from db import db
+
 
 class Location(db.Entity):
     latitude = Required(float)
@@ -62,6 +65,9 @@ def get_event_ids_in_interval(Event, time_start, time_end):
     return select(event.id for event in Event 
                   if time_start <= event.time_start and 
                      event.time_start <= time_end)[:]
+
+def events_to_json(events):
+    return json.dumps(list(map(lambda x: x.event_to_dict(), events)), default=json_serial)
 
 def get_time(iso_time):
     return dateutil.parser.parse(iso_time)

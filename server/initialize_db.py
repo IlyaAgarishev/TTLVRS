@@ -1,6 +1,8 @@
+from datetime import datetime
+
 from db import db
 from classes import *
-from datetime import datetime
+
 
 if __name__ == "__main__":
     db.generate_mapping(create_tables=True)

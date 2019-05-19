@@ -1,9 +1,12 @@
 import aiohttp
-import asyncio
 from aiohttp import web
+import asyncio
+
 from db import db
 from classes import *
-import json
+
+# http://10.34.34.56:8080/api/events?latitude=56.8378024&longitude=60.6030364&radius=500&time_start=2019-05-21T00:00:00&time_end=2019-06-01T00:00:00
+# http://10.34.34.56:8080/api/authors?id=1
 
 async def get_events_handler(request): # request is BaseRequest
     query = request.query # query is MultiDictProxy
@@ -16,8 +19,17 @@ async def get_events_handler(request): # request is BaseRequest
             ids = get_event_ids_in_interval(Event, get_time(query['time_start']), get_time(query['time_end']))
             relevant_event_ids = relevant_event_ids.intersection(ids)
         events = Event.select(lambda x: x.id in relevant_event_ids)[:]
-        events_json = json.dumps(list(map(lambda x: x.event_to_dict(), events)), default=json_serial)
+        events_json = events_to_json(events)
     response = web.Response(text=events_json)
+    return response
+
+async def get_authors_handler(request):
+    query = request.query
+    author_id = query.get('id')
+    with db_session:
+        author_events = list(select(x.events for x in Author if x.id == author_id)[:])
+        author_events_json = events_to_json(author_events)
+    response = web.Response(text=author_events_json)
     return response
 
 async def post_handler(request):
@@ -29,10 +41,11 @@ async def post_handler(request):
 def main():
     app = web.Application()
     app.add_routes([web.get('/api/events', get_events_handler)])
+    app.add_routes([web.get('/api/authors', get_authors_handler)])
     app.add_routes([web.post('/api/events', post_handler)])
 
     web.run_app(app)
-    print("======= Running ======")
+    print("====== Running ======")
 
 if __name__ == "__main__":
     db.generate_mapping(create_tables=True)
