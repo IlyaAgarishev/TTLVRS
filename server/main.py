@@ -1,6 +1,7 @@
 import aiohttp
 from aiohttp import web
 import asyncio
+import aiohttp_cors
 
 from db import db
 from classes import *
@@ -40,9 +41,21 @@ async def post_handler(request):
 
 def main():
     app = web.Application()
-    app.add_routes([web.get('/api/events', get_events_handler)])
-    app.add_routes([web.get('/api/authors', get_authors_handler)])
-    app.add_routes([web.post('/api/events', post_handler)])
+
+    app.router.add_route("GET", "/api/events", get_events_handler)
+    app.router.add_route("GET", "/api/authors", get_authors_handler)
+    app.router.add_route("POST", "/api/events", post_handler)
+
+    cors = aiohttp_cors.setup(app, defaults={
+    "*": aiohttp_cors.ResourceOptions(
+            allow_credentials=True,
+            expose_headers="*",
+            allow_headers="*",
+        )
+    })
+
+    for route in list(app.router.routes()):
+        cors.add(route)
 
     web.run_app(app)
     print("====== Running ======")
